@@ -13,7 +13,7 @@ It is **architecture agnostic**. It has no per-framework plugins and needs no bu
 
 ## Quick start
 
-Python 3.9 or newer is the only requirement for scanning.
+Python 3.11 or newer is the only requirement for scanning.
 
 ```bash
 git clone <this-repository>
