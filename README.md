@@ -2,12 +2,12 @@
 
 SlopSweep is a simple agent that reviews any codebase for four kinds of problems:
 
-| Category | What it finds |
-|---|---|
-| **Security** | Leaked secrets, injection, unsafe deserialization, disabled TLS, weak crypto, XSS sinks, open CORS |
-| **Slop** | Leftover AI chat text, truncated generated code, pasted Markdown fences, placeholder data, duplicated logic, comments that restate code |
+| Category        | What it finds                                                                                                                                |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Security**    | Leaked secrets, injection, unsafe deserialization, disabled TLS, weak crypto, XSS sinks, open CORS                                           |
+| **Slop**        | Leftover AI chat text, truncated generated code, pasted Markdown fences, placeholder data, duplicated logic, comments that restate code      |
 | **Coding gaps** | Stub functions, unimplemented paths, swallowed errors, imports of files that do not exist, undocumented environment variables, missing tests |
-| **Loose ends** | TODO and FIXME notes, merge conflicts, debugger statements, focused or skipped tests, commented-out code, unreachable code, leftover files |
+| **Loose ends**  | TODO and FIXME notes, merge conflicts, debugger statements, focused or skipped tests, commented-out code, unreachable code, leftover files   |
 
 It is **architecture agnostic**. It has no per-framework plugins and needs no build, so it works on monoliths, microservices, monorepos, scripts and infrastructure code alike. A small lexer separates code, strings and comments using only each language's comment and quote syntax, and files of unknown types still get secret and conflict checks.
 
@@ -29,6 +29,21 @@ python -m slopsweep /path/to/project --format markdown --output report.md
 ```
 
 See a [sample report](docs/sample-report.md) produced from the intentionally flawed demo.
+
+## HTTP API
+
+```bash
+python app.py
+```
+
+The server listens on port 8000. Set `HOST` or `PORT` to change that.
+
+| Endpoint      | Behavior                                                                                                   |
+| ------------- | ---------------------------------------------------------------------------------------------------------- |
+| `GET /health` | Returns `{"ok": true}`                                                                                     |
+| `POST /scan`  | Accepts `{"files": {"src/app.py": "file contents"}}` and returns `files_scanned`, `summary` and `findings` |
+
+Requests are limited to 2 MB and 200 files. Paths must be relative. The API writes files to a temporary folder that is deleted after the scan, never runs submitted code, and does not call the Claude API. It has no authentication, so put it behind your own access control before exposing it publicly.
 
 ## Agent mode
 
@@ -64,27 +79,27 @@ The agent reads surrounding code, confirms real issues, dismisses false positive
 
 ## Options
 
-| Option | Purpose |
-|---|---|
-| `--format text\|json\|markdown\|sarif` | Output format. SARIF works with GitHub code scanning |
-| `--output FILE` | Write the report to a file |
-| `--category NAME` | Limit to `security`, `slop`, `gap` or `loose-end` |
-| `--min-severity LEVEL` | Hide findings below a severity |
-| `--fail-on LEVEL` | Exit 1 when a finding reaches this severity |
-| `--agent` | Add the Claude review |
-| `--model`, `--effort`, `--max-steps` | Tune the review. The default model is `claude-opus-5-5` |
-| `--show-dismissed` | Include findings the agent dismissed |
-| `--list-rules` | Print every rule |
+| Option                                 | Purpose                                                 |
+| -------------------------------------- | ------------------------------------------------------- |
+| `--format text\|json\|markdown\|sarif` | Output format. SARIF works with GitHub code scanning    |
+| `--output FILE`                        | Write the report to a file                              |
+| `--category NAME`                      | Limit to `security`, `slop`, `gap` or `loose-end`       |
+| `--min-severity LEVEL`                 | Hide findings below a severity                          |
+| `--fail-on LEVEL`                      | Exit 1 when a finding reaches this severity             |
+| `--agent`                              | Add the Claude review                                   |
+| `--model`, `--effort`, `--max-steps`   | Tune the review. The default model is `claude-opus-5-5` |
+| `--show-dismissed`                     | Include findings the agent dismissed                    |
+| `--list-rules`                         | Print every rule                                        |
 
 Silence a reviewed line with `slopsweep: ignore` or `slopsweep: ignore=SEC010` in a comment on that line or the line above. Paths in `.gitignore` and `.slopsweepignore` are skipped.
 
 ## Results
 
-| Check | Result |
-|---|---|
-| Unit tests | 22 passing, using the standard library only |
-| Flawed demo (`examples/messy_app`, 6 languages plus YAML) | Every planted issue class in the test suite detected |
-| Safe look-alike code (`examples/clean_app`) | 0 findings |
+| Check                                                       | Result                                                             |
+| ----------------------------------------------------------- | ------------------------------------------------------------------ |
+| Unit tests                                                  | 27 passing, using the standard library only                        |
+| Flawed demo (`examples/messy_app`, 6 languages plus YAML)   | Every planted issue class in the test suite detected               |
+| Safe look-alike code (`examples/clean_app`)                 | 0 findings                                                         |
 | Large real codebase (the Anthropic Python SDK, 1,424 files) | About 24 seconds. Tuning against it cut findings from 1,873 to 172 |
 
 ## Limitations

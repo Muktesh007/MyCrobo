@@ -1,0 +1,2 @@
+# No third-party dependencies are needed to scan or run the API.
+# Install anthropic>=1.6 separately only for the optional --agent mode.
