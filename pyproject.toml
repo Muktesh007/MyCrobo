@@ -7,7 +7,7 @@ name = "slopsweep"
 version = "0.1.0"
 description = "Architecture-agnostic agent that finds security issues, slop, coding gaps and loose ends."
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 license = { text = "MIT" }
 dependencies = []
 
