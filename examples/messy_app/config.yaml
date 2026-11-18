@@ -1,0 +1,4 @@
+service:
+  debug: true
+  client_secret: Hx7Pq2Vn9Lt4Zr8K
+  allow_origin: "*"

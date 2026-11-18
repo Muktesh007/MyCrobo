@@ -1,0 +1,4 @@
+# Intentionally flawed samples and the detection patterns themselves
+examples/
+tests/
+slopsweep/rules.py
